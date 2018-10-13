@@ -1,0 +1,30 @@
+entity College {
+    attr Name,
+    attr Office,
+    attr Phone,
+};
+
+entity Dept {
+    attr Name,
+    attr Code,
+    attr Office,
+    attr Phone,
+};
+
+entity Course {
+    
+};
+
+entity Section {
+    
+};
+
+entity Instructor {
+    
+};
+
+entity Student {
+    
+};
+
+relation 1 Dept offers n Course;

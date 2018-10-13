@@ -1,0 +1,68 @@
+use ast;
+
+grammar;
+
+pub EER: ast::EER = {
+    <decls:Multiple<Decl>> => ast::EER { decls }
+}
+
+Decl: ast::Decl = {
+    <entity:Entity> => ast::Decl::Entity(entity),
+    <relation:Relation> => ast::Decl::Relation(relation),
+}
+
+Entity: ast::Entity = {
+    EntityModifier? "entity" <name:Name> "{" <attributes:Comma<Attribute>> "}" => ast::Entity { name, attributes }
+}
+
+EntityModifier = {
+    "weak"
+}
+
+Attribute: ast::Attribute = {
+    AttributeModifier? "attr" <name:Name> <subattributes:Subattributes?> => ast::Attribute { name, subattributes: subattributes.unwrap_or_else(|| Vec::new()) }
+}
+
+Subattributes: Vec<ast::Attribute> = {
+    "{" <subattributes:Comma<Attribute>> "}" => subattributes,
+}
+
+AttributeModifier = {
+    "unique"
+}
+
+Relation: ast::Relation = {
+    "relation" Cardinal Name Name Cardinal Name => ast::Relation {}
+}
+
+Cardinal = {
+    "1",
+    "n",
+    "m",
+}
+
+Name: String = r"[a-zA-Z_][a-zA-Z0-9_]*" => <>.to_owned();
+
+////////////////////
+
+Multiple<T>: Vec<T> = {
+    <v:(<T> ";")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
